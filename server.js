@@ -37,7 +37,10 @@ app.post('/api/register', async (req, res) => {
         [username, password, token],
         (err, result) => {
             if (err) {
-            return res.status(500).json({ message: 'Error while creating a now user', err });
+                if (err.code === 'ER_DUP_ENTRY') {
+                    return res.status(400).json({ message: 'This username is already used' });
+                  }
+                return res.status(500).json({ message: 'Error while creating a now user', err });
             }
             res.status(201).json({ message: 'User created', token });
         }
@@ -70,12 +73,17 @@ app.post('/api/login', (req, res) => {
 
 // Save file
 app.post('/api/files/add', (req, res) => {
-    const { token, file_name, file_dataA_AES, file_data_RC4, file_data_DES } = req.body;
+    const { token, file_name, file_data_AES, file_data_RC4, file_data_DES } = req.body;
     db.query(
-        `INSERT INTO files (user_token, file_name, file_dataA_AES, file_data_RC4, file_data_DES) VALUES (?, ?, ?)`,
-        [token, file_name, file_dataA_AES, file_data_RC4, file_data_DES],
+        `INSERT INTO files (user_token, file_name, file_data_AES, file_data_RC4, file_data_DES) VALUES (?, ?, ?, ?, ?)`,
+        [token, file_name, file_data_AES, file_data_RC4, file_data_DES],
         (err, result) => {
-            if (err) return res.status(500).json({ message: 'Error saving the file', err });
+            if (err) {
+                if (err.code === 'ER_DUP_ENTRY') {
+                    return res.status(400).json({ message: 'File already exist' });
+                }
+                return res.status(500).json({ message: 'Error saving the file', err });
+            }
             res.status(201).json({ message: 'File saved' });
         }
     );
@@ -100,49 +108,51 @@ app.delete('/api/files/delete', (req, res) => {
     );
 });
 
-// Get file
+// Get file or all files names
 app.get('/api/files', (req, res) => {
-    const { token,file_name } = req.body;
-  
-    db.query(
-        `SELECT * FROM files WHERE user_token = ? AND file_name = ?`,
-        [token, file_name],
-        (err, result) => {
-            if (err) return res.status(500).json({ message: 'Error getting the file', err });
-    
-            if (result.length === 0) {
-            return res.status(404).json({ message: 'File not found' });
+    if (Object.keys(req.body).length === 2) {
+        const { token, file_name } = req.body;
+        db.query(
+            `SELECT * FROM files WHERE user_token = ? AND file_name = ?`,
+            [token, file_name],
+            (err, result) => {
+                if (err) return res.status(500).json({ message: 'Error getting the file', err });
+        
+                if (result.length === 0) {
+                return res.status(404).json({ message: 'File not found' });
+                }
+        
+                res.json({ file_data_AES: result[0].file_data_AES, file_data_RC4: result[0].file_data_RC4, file_data_DES: result[0].file_data_DES });
             }
-    
-            res.json({ file_dataA_AES: result[0].file_dataA_AES, file_data_RC4: result[0].file_data_RC4, file_data_DES: result[0].file_data_DES });
-        }
-    );
-});
-
-// Get all files names
-app.get('/api/files', (req, res) => {
-    const { token } = req.body;
-  
-    db.query(
-        `SELECT file_name FROM files WHERE user_token = ?`,
-        [token],
-        (err, result) => {
-            if (err) return res.status(500).json({ message: 'Error getting files', err });
-    
-            const fileNames = result.map(file => file.file_name);
-            res.json({ fileNames });
-        }
-    );
+        );
+    } else {
+        const { token } = req.body;
+        db.query(
+            `SELECT file_name FROM files WHERE user_token = ?`,
+            [token],
+            (err, result) => {
+                if (err) return res.status(500).json({ message: 'Error getting files', err });
+        
+                const fileNames = result.map(file => file.file_name);
+                res.json({ fileNames });
+            }
+        );
+    }  
 });
 
 // Save text
 app.post('/api/texts/add', (req, res) => {
-    const { token, text_name, text_dataA_AES, text_data_RC4, text_data_DES } = req.body;
+    const { token, text_name, text_data_AES, text_data_RC4, text_data_DES } = req.body;
     db.query(
-        `INSERT INTO texts (user_token, text_name, text_dataA_AES, text_data_RC4, text_data_DES) VALUES (?, ?)`,
-        [token, text_name, text_dataA_AES, text_data_RC4, text_data_DES],
+        `INSERT INTO texts (user_token, text_name, text_data_AES, text_data_RC4, text_data_DES) VALUES (?, ?, ?, ?, ?)`,
+        [token, text_name, text_data_AES, text_data_RC4, text_data_DES],
         (err, result) => {
-            if (err) return res.status(500).json({ message: 'Error saving the text', err });
+            if (err) {
+                if (err.code === 'ER_DUP_ENTRY') {
+                    return res.status(400).json({ message: 'Text already exist' });
+                  }
+                return res.status(500).json({ message: 'Error saving the text', err });
+            }
             res.status(201).json({ message: 'Text saved' });
         }
     );
@@ -167,39 +177,36 @@ app.delete('/api/texts/delete', (req, res) => {
     );
 });
 
-// Get text
+// Get text or all texts names
 app.get('/api/texts', (req, res) => {
-    const { token,text_name } = req.body;
-  
-    db.query(
-        `SELECT * FROM texts WHERE user_token = ? AND text_name = ?`,
-        [token, text_name],
-        (err, result) => {
-            if (err) return res.status(500).json({ message: 'Error getting the text', err });
-    
-            if (result.length === 0) {
-            return res.status(404).json({ message: 'Text not found' });
+    if (Object.keys(req.body).length === 2) {
+        const { token,text_name } = req.body;
+        db.query(
+            `SELECT * FROM texts WHERE user_token = ? AND text_name = ?`,
+            [token, text_name],
+            (err, result) => {
+                if (err) return res.status(500).json({ message: 'Error getting the text', err });
+        
+                if (result.length === 0) {
+                return res.status(404).json({ message: 'Text not found' });
+                }
+        
+                res.json({ text_data_AES: result[0].text_data_AES, text_data_RC4: result[0].text_data_RC4, text_data_DES: result[0].text_data_DES });
             }
-    
-            res.json({ text_dataA_AES: result[0].text_dataA_AES, text_data_RC4: result[0].text_data_RC4, text_data_DES: result[0].text_data_DES });
-        }
-    );
-});
-
-// Get all texts names
-app.get('/api/texts', (req, res) => {
-    const { token } = req.body;
-  
-    db.query(
-        `SELECT text_name FROM texts WHERE user_token = ?`,
-        [token],
-        (err, result) => {
-            if (err) return res.status(500).json({ message: 'Error getting texts', err });
-    
-            const textNames = result.map(text => text.text_name);
-            res.json({ textNames });
-        }
-    );
+        );
+    } else {
+        const { token } = req.body;
+        db.query(
+            `SELECT text_name FROM texts WHERE user_token = ?`,
+            [token],
+            (err, result) => {
+                if (err) return res.status(500).json({ message: 'Error getting texts', err });
+        
+                const textNames = result.map(text => text.text_name);
+                res.json({ textNames });
+            }
+        );
+    }
 });
 
 // Start server
