@@ -66,7 +66,7 @@ or
     token: "",
     file_name: "",
     file_data_AES: "",
-    file data_RC4: "",
+    file_data_RC4: "",
     file_data_DES: ""
 }
 ```

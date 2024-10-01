@@ -73,7 +73,13 @@ app.post('/api/login', (req, res) => {
 
 // Save file
 app.post('/api/files/add', (req, res) => {
-    const { token, file_name, file_data_AES, file_data_RC4, file_data_DES } = req.body;
+    const header_token = req.headers['authorization'];
+    if (!header_token || !header_token.startsWith('Bearer ')) {
+        return res.status(401).json({ message: 'Invalid Token' });
+    }
+    const token = header_token.split(' ')[1];
+    const { file_name, file_data_AES, file_data_RC4, file_data_DES } = req.body;
+
     db.query(
         `INSERT INTO files (user_token, file_name, file_data_AES, file_data_RC4, file_data_DES) VALUES (?, ?, ?, ?, ?)`,
         [token, file_name, file_data_AES, file_data_RC4, file_data_DES],
@@ -91,7 +97,12 @@ app.post('/api/files/add', (req, res) => {
 
 // Delete file
 app.delete('/api/files/delete', (req, res) => {
-    const { token, file_name } = req.body;
+    const header_token = req.headers['authorization'];
+    if (!header_token || !header_token.startsWith('Bearer ')) {
+        return res.status(401).json({ message: 'Invalid Token' });
+    }
+    const token = header_token.split(' ')[1];
+    const { file_name } = req.body;
   
     db.query(
         `DELETE FROM files WHERE user_token = ? AND file_name = ?`,
@@ -108,41 +119,60 @@ app.delete('/api/files/delete', (req, res) => {
     );
 });
 
-// Get file or all files names
-app.get('/api/files', (req, res) => {
-    if (Object.keys(req.body).length === 2) {
-        const { token, file_name } = req.body;
-        db.query(
-            `SELECT * FROM files WHERE user_token = ? AND file_name = ?`,
-            [token, file_name],
-            (err, result) => {
-                if (err) return res.status(500).json({ message: 'Error getting the file', err });
-        
-                if (result.length === 0) {
-                return res.status(404).json({ message: 'File not found' });
-                }
-        
-                res.json({ file_data_AES: result[0].file_data_AES, file_data_RC4: result[0].file_data_RC4, file_data_DES: result[0].file_data_DES });
+// Get file 
+app.get('/api/files/:file_name', (req, res) => {
+    const header_token = req.headers['authorization'];
+    if (!header_token || !header_token.startsWith('Bearer ')) {
+        return res.status(401).json({ message: 'Invalid Token' });
+    }
+    const token = header_token.split(' ')[1];
+    const { file_name } = req.params;
+
+    db.query(
+        `SELECT * FROM files WHERE user_token = ? AND file_name = ?`,
+        [token, file_name],
+        (err, result) => {
+            if (err) return res.status(500).json({ message: 'Error getting the file', err });
+    
+            if (result.length === 0) {
+            return res.status(404).json({ message: 'File not found' });
             }
-        );
-    } else {
-        const { token } = req.body;
-        db.query(
-            `SELECT file_name FROM files WHERE user_token = ?`,
-            [token],
-            (err, result) => {
-                if (err) return res.status(500).json({ message: 'Error getting files', err });
-        
-                const fileNames = result.map(file => file.file_name);
-                res.json({ fileNames });
-            }
-        );
-    }  
+    
+            res.json({ file_data_AES: result[0].file_data_AES, file_data_RC4: result[0].file_data_RC4, file_data_DES: result[0].file_data_DES });
+        }
+    );
 });
+
+// Get all files names
+app.get('/api/files', (req, res) => {
+    const header_token = req.headers['authorization'];
+    if (!header_token || !header_token.startsWith('Bearer ')) {
+        return res.status(401).json({ message: 'Invalid Token' });
+    }
+    const token = header_token.split(' ')[1];
+
+    db.query(
+        `SELECT file_name FROM files WHERE user_token = ?`,
+        [token],
+        (err, result) => {
+            if (err) return res.status(500).json({ message: 'Error getting files', err });
+    
+            const fileNames = result.map(file => file.file_name);
+            res.json({ fileNames });
+        }
+    );
+});
+
 
 // Save text
 app.post('/api/texts/add', (req, res) => {
-    const { token, text_name, text_data_AES, text_data_RC4, text_data_DES } = req.body;
+    const header_token = req.headers['authorization'];
+    if (!header_token || !header_token.startsWith('Bearer ')) {
+        return res.status(401).json({ message: 'Invalid Token' });
+    }
+    const token = header_token.split(' ')[1];
+    const { text_name, text_data_AES, text_data_RC4, text_data_DES } = req.body;
+
     db.query(
         `INSERT INTO texts (user_token, text_name, text_data_AES, text_data_RC4, text_data_DES) VALUES (?, ?, ?, ?, ?)`,
         [token, text_name, text_data_AES, text_data_RC4, text_data_DES],
@@ -160,7 +190,12 @@ app.post('/api/texts/add', (req, res) => {
 
 // Delete text
 app.delete('/api/texts/delete', (req, res) => {
-    const { token, text_name } = req.body;
+    const header_token = req.headers['authorization'];
+    if (!header_token || !header_token.startsWith('Bearer ')) {
+        return res.status(401).json({ message: 'Invalid Token' });
+    }
+    const token = header_token.split(' ')[1];
+    const { text_name } = req.body;
   
     db.query(
         `DELETE FROM texts WHERE user_token = ? AND text_name = ?`,
@@ -169,45 +204,57 @@ app.delete('/api/texts/delete', (req, res) => {
             if (err) return res.status(500).json({ message: 'Error deleting the text', err });
     
             if (result.affectedRows === 0) {
-            return res.status(404).json({ message: 'Text not found' });
+                return res.status(404).json({ message: 'Text not found' });
             }
-    
             res.json({ message: 'Text deleted' });
         }
     );
 });
 
-// Get text or all texts names
-app.get('/api/texts', (req, res) => {
-    if (Object.keys(req.body).length === 2) {
-        const { token,text_name } = req.body;
-        db.query(
-            `SELECT * FROM texts WHERE user_token = ? AND text_name = ?`,
-            [token, text_name],
-            (err, result) => {
-                if (err) return res.status(500).json({ message: 'Error getting the text', err });
-        
-                if (result.length === 0) {
-                return res.status(404).json({ message: 'Text not found' });
-                }
-        
-                res.json({ text_data_AES: result[0].text_data_AES, text_data_RC4: result[0].text_data_RC4, text_data_DES: result[0].text_data_DES });
-            }
-        );
-    } else {
-        const { token } = req.body;
-        db.query(
-            `SELECT text_name FROM texts WHERE user_token = ?`,
-            [token],
-            (err, result) => {
-                if (err) return res.status(500).json({ message: 'Error getting texts', err });
-        
-                const textNames = result.map(text => text.text_name);
-                res.json({ textNames });
-            }
-        );
+// Get text 
+app.get('/api/texts/:text_name', (req, res) => {
+    const header_token = req.headers['authorization'];
+    if (!header_token || !header_token.startsWith('Bearer ')) {
+        return res.status(401).json({ message: 'Invalid Token' });
     }
+    const token = header_token.split(' ')[1];
+    const { text_name } = req.params;
+
+    db.query(
+        `SELECT * FROM texts WHERE user_token = ? AND text_name = ?`,
+        [token, text_name],
+        (err, result) => {
+            if (err) return res.status(500).json({ message: 'Error getting the text', err });
+    
+            if (result.length === 0) {
+            return res.status(404).json({ message: 'Text not found' });
+            }
+    
+            res.json({ text_data_AES: result[0].text_data_AES, text_data_RC4: result[0].text_data_RC4, text_data_DES: result[0].text_data_DES });
+        }
+    );
 });
+
+// Get all texts names
+app.get('/api/texts', (req, res) => {
+    const header_token = req.headers['authorization'];
+    if (!header_token || !header_token.startsWith('Bearer ')) {
+        return res.status(401).json({ message: 'Invalid Token' });
+    }
+    const token = header_token.split(' ')[1];
+    
+    db.query(
+        `SELECT text_name FROM texts WHERE user_token = ?`,
+        [token],
+        (err, result) => {
+            if (err) return res.status(500).json({ message: 'Error getting texts', err });
+    
+            const textNames = result.map(text => text.text_name);
+            res.json({ textNames });
+        }
+    );
+});
+
 
 // Start server
 const PORT = process.env.PORT || 3000;
