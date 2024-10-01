@@ -2,12 +2,13 @@ const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const bodyParser = require('body-parser');
 
 dotenv.config();
 
 const app = express();
-app.use(cors());
-app.use(express.json()); 
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true })); 
 
 // Configuration connection MySQL
 const db = mysql.createConnection({
