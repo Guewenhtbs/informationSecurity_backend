@@ -124,12 +124,7 @@ or
 ```json
 "authorization" = "Bearer ${token}"
 ```
-+ body = 
-```json
-{ 
-    "file_name": "" 
-}
-```
+
 
 ### result
 ```json
@@ -239,12 +234,7 @@ or
 ```json
 "authorization" = "Bearer ${token}"
 ```
-+ body = 
-```json
-{ 
-    "text_name": "" 
-}
-```
+
 
 ### result
 ```json
