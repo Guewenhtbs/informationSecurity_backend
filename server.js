@@ -1,6 +1,5 @@
 const express = require('express');
 const mysql = require('mysql2');
-const cors = require('cors');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 
@@ -31,7 +30,8 @@ db.connect((err) => {
 app.post('/api/register', async (req, res) => {
     const { username, password } = req.body;
 
-    const token = Math.random().toString(36).substring(2);
+    // Generate a random token to identify the user for next http request
+    const token = crypto.randomUUID()
   
     db.query(
         `INSERT INTO users (username, password, token) VALUES (?, ?, ?)`,
@@ -260,5 +260,5 @@ app.get('/api/texts', (req, res) => {
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Serveur démarré sur le port ${PORT}`);
+  console.log(`Server started on port ${PORT}`);
 });
