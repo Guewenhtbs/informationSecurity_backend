@@ -3,11 +3,13 @@ const mysql = require('mysql2');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 const axios = require('axios');
+const cors = require('cors');
+const crypto = require('crypto');
 
 dotenv.config();
 
 const app = express();
-
+app.use(cors()) ;
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true })); 
 
