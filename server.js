@@ -280,7 +280,7 @@ db.connect((err) => {
     }
   });
 
-  // Get the key to salt the password
+  // Get the key to add salt to the password
   app.get('/get-key-password', async (req, res) => {
     try {
       const response = await axios.get(`${VAULT_ADDR}/v1/secret/data/key-password`, {
