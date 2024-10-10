@@ -3,13 +3,13 @@
 ## Initialisation
 
 - Download mysql
-- create a .env like that in this folder:
+- create a .env like that in the project:
 ```js
 DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD= //your password
 DB_NAME=informationsecurity
-PORT=3000
+PORT=3306
 ```
 - open a terminal in this folder and write:
 
@@ -29,6 +29,11 @@ mysql -u root -p informationsecurity < informationsecurity.sql
 ```
 
 ## Run
+
+First, install express in your project:
+```bash
+npm install express
+```
 
 Run the server by opening a terminal in this folder and writing:
 

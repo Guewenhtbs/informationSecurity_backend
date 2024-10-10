@@ -8,22 +8,22 @@
 + body = 
 ```json
 {
-    username: "",
-    password: ""
+    "username": "",
+    "password": ""
 }
 ```
 
 ### result
 ```json
 {
-    message: "User created",
-    token: ""
+    "message": "User created",
+    "token": ""
 }
 ```
 or 
 ```json
 {
-    message: "Error explained"
+    "message": "Error explained"
 }
 ```
 
@@ -35,21 +35,21 @@ or
 + body = 
 ```json
 {
-    username: "",
-    password: ""
+    "username": "",
+    "password": ""
 }
 ```
 
 ### result
 ```json
 {
-    token: ""
+    "token": ""
 }
 ```
 or 
 ```json
 {
-    message: "Error explained"
+    "message": "Error explained"
 }
 ```
 
@@ -60,27 +60,30 @@ or
 ### request
 + method : POST
 + URL = localhost:3000/api/files/add
++ header: 
+```json
+"authorization" = "Bearer ${token}"
+```
 + body = 
 ```json
 {
-    token: "",
-    file_name: "",
-    file_data_AES: "",
-    file data_RC4: "",
-    file_data_DES: ""
+    "file_name": "",
+    "file_data_AES": "",
+    "file_data_RC4": "",
+    "file_data_DES": ""
 }
 ```
 
 ### result
 ```json
 {
-    message: "File saved"
+    "message": "File saved"
 }
 ```
 or 
 ```json
 {
-    message: "Error explained"
+    "message": "Error explained"
 }
 ```
 
@@ -89,94 +92,108 @@ or
 ### request
 + method : DELETE
 + URL = localhost:3000/api/files/delete
++ header: 
+```json
+"authorization" = "Bearer ${token}"
+```
 + body = 
 ```json
 {
-    token: "",
-    file_name: ""
+    "file_name": ""
 }
 ```
 
 ### result
 ```json
 {
-    message: "File deleted"
+    "message": "File deleted"
 }
 ```
 or 
 ```json
 {
-    message: "Error explained"
+    "message": "Error explained"
 }
 ```
 
-## Get file or get all files
+## Get file 
+### request
++ method : GET
++ URL = localhost:3000/api/files/:file_name
++ header: 
+```json
+"authorization" = "Bearer ${token}"
+```
+
+
+### result
+```json
+{
+    "file_data_AES": "",
+    "file_data_RC4": "",
+    "file_data_DES": ""
+}
+```
+or 
+```json
+{
+   "message": "Error explained"
+}
+```
+
+## Get all files 
 ### request
 + method : GET
 + URL = localhost:3000/api/files
-+ body = 
++ header: 
 ```json
-{
-    token: "", // Get all files 
-}
-```
-or 
-```json
-{
-    token: "", 
-    file_name: "" // Get the file you want
-}
+"authorization" = "Bearer ${token}"
 ```
 
 ### result
 ```json
 {
-    fileNames: ["","","",""]
-}
-```
-or
-```json
-{
-    file_data_AES: "",
-    file data_RC4: "",
-    file_data_DES: ""
+    "fileNames": ["","","",""]
 }
 ```
 or 
 ```json
 {
-    message: "Error explained"
+   "message": "Error explained"
 }
 ```
 
 # Text
 
-## Save text
+## Save Text
 
 ### request
 + method : POST
 + URL = localhost:3000/api/texts/add
++ header: 
+```json
+"authorization" = "Bearer ${token}"
+```
 + body = 
 ```json
 {
-    token: "",
-    text_name: "",
-    text_data_AES: "",
-    text data_RC4: "",
-    text_data_DES: ""
+    "text_name": "",
+    "text_data_AES": "",
+    "text_data_RC4": "",
+    "text_data_DES": ""
 }
 ```
 
 ### result
 ```json
 {
-    message: "Text saved"
+    "message": "text saved"
 }
 ```
 or 
 ```json
 {
-    message: "Error explained"
+    "message": "Error explained"
 }
 ```
 
@@ -185,65 +202,73 @@ or
 ### request
 + method : DELETE
 + URL = localhost:3000/api/texts/delete
++ header: 
+```json
+"authorization" = "Bearer ${token}"
+```
 + body = 
 ```json
 {
-    token: "",
-    text_name: ""
+    "text_name": ""
 }
 ```
 
 ### result
 ```json
 {
-    message: "Text deleted"
+    "message": "text deleted"
 }
 ```
 or 
 ```json
 {
-    message: "Error explained"
+    "message": "Error explained"
 }
 ```
 
-## Get text or get all texts
+## Get text 
+### request
++ method : GET
++ URL = localhost:3000/api/texts/:text_name
++ header: 
+```json
+"authorization" = "Bearer ${token}"
+```
+
+
+### result
+```json
+{
+    "text_data_AES": "",
+    "text_data_RC4": "",
+    "text_data_DES": ""
+}
+```
+or 
+```json
+{
+   "message": "Error explained"
+}
+```
+
+## Get all texts 
 ### request
 + method : GET
 + URL = localhost:3000/api/texts
-+ body = 
++ header: 
 ```json
-{
-    token: "", // Get all texts 
-}
-```
-or 
-```json
-{
-    token: "", 
-    text_name: "" // Get the text you want
-}
+"authorization" = "Bearer ${token}"
 ```
 
 ### result
 ```json
 {
-    textNames: ["","","",""]
-}
-```
-or
-```json
-{
-    text_data_AES: "",
-    text data_RC4: "",
-    text_data_DES: ""
+    "textNames": ["","","",""]
 }
 ```
 or 
 ```json
 {
-    message: "Error explained"
+   "message": "Error explained"
 }
 ```
-
-
-
