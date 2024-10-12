@@ -1,5 +1,13 @@
 # informationSecurity_backend
 
+## Create your vault
+
+Install a vault (I use HashiCorp Vault)
+
+Add the key named 'encryption-key' which will be used to encrypt and decrypt data
+
+Add the key named 'key-password' which will be the salt added to the user password before hashing
+
 ## Initialisation
 
 - Download mysql
@@ -10,6 +18,7 @@ DB_USER=root
 DB_PASSWORD= //your password
 DB_NAME=informationsecurity
 PORT=3306
+VAULT_TOKEN=//your vault's token
 ```
 - open a terminal in this folder and write:
 
