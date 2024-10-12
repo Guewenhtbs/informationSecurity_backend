@@ -4,6 +4,8 @@
 
 Install a vault (I use HashiCorp Vault)
 
+Launch your vault and get the root token
+
 Add the key named 'encryption-key' which will be used to encrypt and decrypt data
 
 Add the key named 'key-password' which will be the salt added to the user password before hashing
