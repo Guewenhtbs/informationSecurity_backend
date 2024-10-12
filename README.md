@@ -19,7 +19,8 @@ DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD= //your password
 DB_NAME=informationsecurity
-PORT=3306
+DB_PORT=3306 
+PORT=3000
 VAULT_TOKEN=//your vault's token
 ```
 - open a terminal in this folder and write:
